@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from backend.routers import user_routes
 from backend.routers import admin_routes
 from backend.config import BASE_DIR
+import backend.config
 from fastapi.middleware.cors import CORSMiddleware
 
 
