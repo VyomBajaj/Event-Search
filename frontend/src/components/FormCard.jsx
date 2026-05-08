@@ -36,12 +36,12 @@ export default function FormCard({ setResults, setSubmitted }) {
       if (!uploadRes.ok) throw new Error("Upload failed");
 
       const uploadData = await uploadRes.json();
-      const filename = uploadData.filename;
+      const imageUrl = uploadData.image_url;
 
       // Match
       const matchForm = new FormData();
       matchForm.append("event", eventName.trim());
-      matchForm.append("filename", filename);
+      matchForm.append("image_url", imageUrl);
 
       const matchRes = await fetch(GET_PHOTOS_URL, {
         method: "POST",
