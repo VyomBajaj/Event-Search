@@ -1,15 +1,21 @@
 import { useState } from "react";
 import { StatusMessage } from "./StatusMessage";
 const UPLOAD_FOLDER_URL = "http://127.0.0.1:8000/admin/upload-folder";
-export function UploadZipCard() {
-  const [event, setEvent] = useState("");
+export function UploadZipCard({
+  selectedEvent
+}) {
   const [zipFile, setZipFile] = useState(null);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleUpload = async () => {
-    if (!event.trim()) {
-      setStatus({ type: "error", text: "Event name is required." });
+    if (!selectedEvent) {
+
+      setStatus({
+        type: "error",
+        text: "Please create/select an event first."
+      });
+
       return;
     }
     if (!zipFile) {
@@ -26,7 +32,10 @@ export function UploadZipCard() {
 
     try {
       const form = new FormData();
-      form.append("event", event.trim());
+      form.append(
+        "event_id",
+        selectedEvent.event_id
+      );
       form.append("zip_file", zipFile);
 
       // Simulate processing stage after a moment
@@ -67,14 +76,27 @@ export function UploadZipCard() {
 
       <div className="card-body">
         <div className="field-group">
-          <label className="field-label">TARGET EVENT</label>
-          <input
-            className="field-input"
-            type="text"
-            placeholder="Must match an existing event"
-            value={event}
-            onChange={(e) => { setEvent(e.target.value); setStatus(null); }}
-          />
+
+          <label className="field-label">
+            SELECTED EVENT
+          </label>
+
+          <div className="selected-event-box">
+
+            {selectedEvent ? (
+              <>
+                <span>
+                  {selectedEvent.event_name}
+                </span>
+              </>
+            ) : (
+              <span>
+                No event selected
+              </span>
+            )}
+
+          </div>
+
         </div>
 
         <div className="field-group">

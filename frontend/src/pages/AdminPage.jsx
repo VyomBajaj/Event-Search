@@ -2,8 +2,10 @@ import "../AdminPage.css";
 import Navbar from "../components/Navbar";
 import { CreateEventCard } from "../components/CreateEventCard";
 import { UploadZipCard } from "../components/UploadZipCard";
+import { useState } from "react";
 
 export default function AdminPage() {
+  const [selectedEvent, setSelectedEvent] = useState(null);
   return (
     <div className="admin-app">
       <Navbar />
@@ -14,8 +16,12 @@ export default function AdminPage() {
         </div>
 
         <div className="cards-stack">
-          <CreateEventCard />
-          <UploadZipCard />
+          <CreateEventCard
+  setSelectedEvent={setSelectedEvent}
+/>
+          <UploadZipCard
+  selectedEvent={selectedEvent}
+/>
         </div>
       </main>
 
