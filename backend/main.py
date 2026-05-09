@@ -1,10 +1,10 @@
 from fastapi import FastAPI,APIRouter
-from fastapi.staticfiles import StaticFiles
 from backend.routers import user_routes
 from backend.routers import admin_routes
 from backend.config import BASE_DIR
 import backend.config
 from fastapi.middleware.cors import CORSMiddleware
+from backend.database import db
 
 
 
@@ -19,11 +19,6 @@ app.add_middleware(
 )
 
 
-app.mount(
-    "/static",
-    StaticFiles(directory=BASE_DIR/'data'),
-    name="static"
-)
 
 
 router = APIRouter()
@@ -31,6 +26,7 @@ router = APIRouter()
 @app.get('/')
 def home_route():
     return {"message":"Hello"}
+
 
 app.include_router(user_routes.router)
 app.include_router(admin_routes.router)

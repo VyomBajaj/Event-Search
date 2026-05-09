@@ -15,27 +15,29 @@ def save_data(data):
 
 
 def load_data():
+
     json_path = get_json_path()
+
     if os.path.exists(json_path):
         with open(json_path, 'r') as f:
             return json.load(f)
+
     return {}
 
 
-def check(folder_key, data):
-    return folder_key in data
+def check(event_id, data):
+    return event_id in data
 
 
-def generate_folder_embeddings(folder_path):
+def generate_folder_embeddings(folder_path, event_id):
 
     if not folder_path.exists():
         raise Exception(f"Folder not found: {folder_path}")
 
     data = load_data()
-    folder_key = folder_path.name
 
-    if check(folder_key, data):
-        print(f"Embeddings already exist for event: {folder_key}")
+    if check(event_id, data):
+        print(f"Embeddings already exist for event: {event_id}")
         return
 
     image_paths = [
@@ -43,10 +45,12 @@ def generate_folder_embeddings(folder_path):
         if file.suffix.lower() in [".jpg", ".png", ".jpeg", ".webp"]
     ]
 
-    store = {}
+    store = []
 
     for file_path in image_paths:
+
         try:
+
             embeddings = DeepFace.represent(
                 img_path=str(file_path),
                 model_name='ArcFace',
@@ -54,13 +58,16 @@ def generate_folder_embeddings(folder_path):
                 detector_backend='retinaface'
             )
 
-            relative_path = str(file_path.relative_to(folder_path.parent))
-            store[relative_path] = [e['embedding'] for e in embeddings]
+            store.append({
+                "image_name": file_path.name,
+                "embedding": [e['embedding'] for e in embeddings]
+            })
 
         except Exception as e:
             print(f"Skipping {file_path}: {e}")
 
-    data[folder_key] = store
+    data[event_id] = store
+
     save_data(data)
 
-    print(f"Stored embeddings for event: {folder_key}")
+    print(f"Stored embeddings for event: {event_id}")

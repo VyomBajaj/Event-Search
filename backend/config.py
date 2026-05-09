@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # important paths
 UPLOAD_DIR = BASE_DIR / "backend" / "uploads"
-DATA_DIR = BASE_DIR / "data"
+DATA_DIR = BASE_DIR 
 STORE_PATH = BASE_DIR / "scripts" / "store.json"
 
 

@@ -5,75 +5,210 @@ import tempfile
 import shutil
 import zipfile
 from utils.generate_folder_embeddings import generate_folder_embeddings
+from backend.services.mongo_service import create_event_db
 router = APIRouter(prefix='/admin')
+from backend.services.cloudinary_service import upload_dataset_image
+from backend.services.mongo_service import insert_image_db
+from backend.schemas.image_schema import ImageSchema
 
 
 @router.post('/create-event')
 async def create_event(event: str = Form(...)):
 
-    event_path = DATA_DIR / event
+    event_id = create_event_db(event)
 
-    # check if already exists
-    if event_path.exists():
+    if not event_id:
         return {
-            "message": "Event already exists",
-            "event": event
+            "message": "Event already exists"
         }
-
-    # create folder
-    event_path.mkdir(parents=True, exist_ok=True)
-
-    # To return password will make later when we add DB
 
     return {
         "message": "Event created successfully",
-        "event": event
+        "event_id": event_id
     }
 
 @router.post('/upload-folder')
 async def upload_folder(
-    event: str = Form(...),
+    event_id: str = Form(...),
     zip_file: UploadFile = File(...)
 ):
-    event_path = DATA_DIR / event
-    event_path.mkdir(parents=True, exist_ok=True)
 
-    # 1. Save zip temporarily
-    temp_zip_path = Path(tempfile.gettempdir()) / zip_file.filename
+    temp_zip_path = None
+    temp_extract_path = None
+    processed_path = None
 
-    with open(temp_zip_path, "wb") as buffer:
-        shutil.copyfileobj(zip_file.file, buffer)
+    try:
+        # 1. Save ZIP temporarily
+        temp_zip_path = (
+            Path(tempfile.gettempdir())
+            / zip_file.filename
+        )
 
-    # 2. Extract to temp folder
-    temp_extract_path = Path(tempfile.mkdtemp())
+        with open(temp_zip_path, "wb") as buffer:
 
-    with zipfile.ZipFile(temp_zip_path, 'r') as zip_ref:
-        zip_ref.extractall(temp_extract_path)
+            shutil.copyfileobj(
+                zip_file.file,
+                buffer
+            )
+        
+        # 2. Extract ZIP temporarily
+        temp_extract_path = Path(
+            tempfile.mkdtemp()
+        )
 
-    # 3. Flatten files
-    for file in temp_extract_path.rglob("*"):
-        if file.name.startswith("."):
-            continue
-        if file.is_file() and file.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]:
+        with zipfile.ZipFile(
+            temp_zip_path,
+            'r'
+        ) as zip_ref:
 
-            destination = event_path / file.name
+            zip_ref.extractall(
+                temp_extract_path
+            )
 
-            # handle duplicate names
-            count = 1
-            while destination.exists():
-                destination = event_path / f"{file.stem}_{count}{file.suffix}"
-                count += 1
+        # 3. Flatten images
 
-            shutil.move(str(file), destination)
+        processed_path = Path(
+            tempfile.mkdtemp()
+        )
 
-    # 4. Cleanup
-    shutil.rmtree(temp_extract_path)
-    temp_zip_path.unlink()
+        for file in temp_extract_path.rglob("*"):
 
-    # 5. Generate embeddings
-    generate_folder_embeddings(event_path)
+            if file.name.startswith("."):
+                continue
 
-    return {
-        "message": "Images uploaded, flattened, and embeddings created successfully",
-        "event": event
-    }
+            if (
+                file.is_file()
+                and file.suffix.lower()
+                in [".jpg", ".jpeg",
+                    ".png", ".webp"]
+            ):
+
+                destination = (
+                    processed_path
+                    / file.name
+                )
+
+                count = 1
+
+                while destination.exists():
+
+                    destination = (
+                        processed_path
+                        / f"{file.stem}_{count}"
+                          f"{file.suffix}"
+                    )
+
+                    count += 1
+
+                shutil.move(
+                    str(file),
+                    destination
+                )
+
+        # 4. Generate embeddings
+        generate_folder_embeddings(
+            processed_path,
+            event_id
+        )
+
+        # 5. Upload to Cloudinary
+
+        for file in processed_path.glob("*"):
+
+            uploaded = upload_dataset_image(
+                file,
+                event_id
+            )
+
+            # 6. Store metadata in MongoDB
+
+            image_data = ImageSchema(
+
+                event_id=event_id,
+
+                image_url=uploaded[
+                    "image_url"
+                ],
+
+                public_id=uploaded[
+                    "public_id"
+                ],
+
+                image_name=file.name
+            )
+
+            insert_image_db(
+                image_data
+            )
+
+
+
+        return {
+            "message":
+            "Dataset uploaded successfully",
+
+            "event_id": event_id
+        }
+
+    except Exception as e:
+
+        print("UPLOAD FOLDER ERROR:")
+        print(e)
+
+        return {
+            "error": str(e)
+        }
+
+    finally:
+
+        # Cleanup ZIP
+
+        try:
+
+            if (
+                temp_zip_path
+                and temp_zip_path.exists()
+            ):
+
+                temp_zip_path.unlink()
+
+        except Exception as e:
+
+            print("ZIP CLEANUP ERROR:")
+            print(e)
+
+        # Cleanup extracted folder
+
+        try:
+
+            if (
+                temp_extract_path
+                and temp_extract_path.exists()
+            ):
+
+                shutil.rmtree(
+                    temp_extract_path
+                )
+
+        except Exception as e:
+
+            print("EXTRACT CLEANUP ERROR:")
+            print(e)
+
+        # Cleanup processed folder
+
+        try:
+
+            if (
+                processed_path
+                and processed_path.exists()
+            ):
+
+                shutil.rmtree(
+                    processed_path
+                )
+
+        except Exception as e:
+
+            print("PROCESSED CLEANUP ERROR:")
+            print(e)

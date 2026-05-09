@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { StatusMessage } from "./StatusMessage";
 const CREATE_EVENT_URL = "http://127.0.0.1:8000/admin/create-event";
-export function CreateEventCard() {
+export function CreateEventCard({
+  setSelectedEvent
+}) {
   const [eventName, setEventName] = useState("");
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,16 @@ export function CreateEventCard() {
 
       if (!res.ok) throw new Error(data.detail || "Request failed.");
 
-      setStatus({ type: "success", text: data.message || "Event created successfully." });
+      setSelectedEvent({
+        event_id: data.event_id,
+        event_name: eventName.trim()
+      });
+
+      setStatus({
+        type: "success",
+        text: data.message || "Event created successfully."
+      });
+
       setEventName("");
     } catch (err) {
       setStatus({ type: "error", text: err.message || "Something went wrong." });
@@ -34,9 +45,9 @@ export function CreateEventCard() {
   };
 
   return (
-    
+
     <div className="panel-card">
-      
+
       <div className="card-header">
         <span className="card-index">01</span>
         <div>

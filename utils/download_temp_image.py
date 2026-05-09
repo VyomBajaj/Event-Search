@@ -1,5 +1,6 @@
 import requests
 import tempfile
+from pathlib import Path
 
 def download_temp_image(image_url):
 
@@ -13,4 +14,4 @@ def download_temp_image(image_url):
     temp_file.write(response.content)
     temp_file.close()
 
-    return temp_file.name
+    return Path(temp_file.name)
