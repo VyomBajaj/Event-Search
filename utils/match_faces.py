@@ -34,11 +34,11 @@ def load_data():
 
     return {}
 
-
+EMBEDDINGS_CACHE = load_data()
 def match_faces(event_id, query_embedding,
                 k=10, threshold=0.45):
 
-    data = load_data()
+    data = EMBEDDINGS_CACHE
 
     if event_id not in data:
         print("No embeddings found for event")
@@ -52,7 +52,7 @@ def match_faces(event_id, query_embedding,
 
     for item in event_embeddings:
 
-        image_name = item["image_name"]
+        image_id = item["image_id"]
 
         embed_list = item["embedding"]
 
@@ -79,7 +79,7 @@ def match_faces(event_id, query_embedding,
         if max_sim >= threshold:
 
             scores.append({
-                "image_name": image_name,
+                "image_id": image_id,
                 "score": float(max_sim)
             })
 

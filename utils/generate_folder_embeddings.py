@@ -1,16 +1,19 @@
 from deepface import DeepFace
 import json
 import os
-from pathlib import Path
+
 from backend.config import BASE_DIR
 
 
 def get_json_path():
+
     return BASE_DIR / "scripts" / "store.json"
 
 
 def save_data(data):
+
     with open(get_json_path(), 'w') as f:
+
         json.dump(data, f, indent=2)
 
 
@@ -19,55 +22,71 @@ def load_data():
     json_path = get_json_path()
 
     if os.path.exists(json_path):
+
         with open(json_path, 'r') as f:
             return json.load(f)
 
     return {}
 
 
-def check(event_id, data):
-    return event_id in data
 
-
-def generate_folder_embeddings(folder_path, event_id):
-
-    if not folder_path.exists():
-        raise Exception(f"Folder not found: {folder_path}")
+def generate_single_image_embedding(
+    image_path,
+    event_id,
+    image_id
+):
 
     data = load_data()
 
-    if check(event_id, data):
-        print(f"Embeddings already exist for event: {event_id}")
-        return
 
-    image_paths = [
-        file for file in folder_path.glob("*")
-        if file.suffix.lower() in [".jpg", ".png", ".jpeg", ".webp"]
-    ]
+    if event_id not in data:
 
-    store = []
+        data[event_id] = []
 
-    for file_path in image_paths:
 
-        try:
 
-            embeddings = DeepFace.represent(
-                img_path=str(file_path),
-                model_name='ArcFace',
-                enforce_detection=False,
-                detector_backend='retinaface'
-            )
+    try:
 
-            store.append({
-                "image_name": file_path.name,
-                "embedding": [e['embedding'] for e in embeddings]
-            })
+        embeddings = DeepFace.represent(
 
-        except Exception as e:
-            print(f"Skipping {file_path}: {e}")
+            img_path=str(image_path),
 
-    data[event_id] = store
+            model_name='ArcFace',
 
-    save_data(data)
+            enforce_detection=False,
 
-    print(f"Stored embeddings for event: {event_id}")
+            detector_backend='retinaface'
+        )
+
+
+
+
+        data[event_id].append({
+
+            "image_id": image_id,
+
+            "embedding": [
+                e['embedding']
+                for e in embeddings
+            ]
+        })
+
+
+
+        save_data(data)
+
+        print(
+            f"Stored embedding for image:"
+            f" {image_id}"
+        )
+
+
+
+    except Exception as e:
+
+        print(
+            f"Embedding generation failed:"
+            f" {image_path}"
+        )
+
+        print(e)

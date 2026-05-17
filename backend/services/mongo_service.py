@@ -73,3 +73,23 @@ def get_event_by_name(event_name):
         print(e)
 
         return None
+    
+ 
+
+
+def get_image_by_id(image_id):
+
+    try:
+
+        image = images_collection.find_one({
+            "_id": ObjectId(image_id)
+        })
+
+        return image
+
+    except Exception as e:
+
+        print("GET IMAGE BY ID ERROR:")
+        print(e)
+
+        return None

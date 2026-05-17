@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import shutil
 import zipfile
-from utils.generate_folder_embeddings import generate_folder_embeddings
+from utils.generate_folder_embeddings import generate_single_image_embedding
 from backend.services.mongo_service import create_event_db
 router = APIRouter(prefix='/admin')
 from backend.services.cloudinary_service import upload_dataset_image
@@ -105,22 +105,24 @@ async def upload_folder(
                     destination
                 )
 
-        # 4. Generate embeddings
-        generate_folder_embeddings(
-            processed_path,
-            event_id
-        )
-
-        # 5. Upload to Cloudinary
+        # 4. Process each image
 
         for file in processed_path.glob("*"):
+
+            # -----------------------------------
+            # Upload to Cloudinary
+            # -----------------------------------
 
             uploaded = upload_dataset_image(
                 file,
                 event_id
             )
 
-            # 6. Store metadata in MongoDB
+
+
+            # -----------------------------------
+            # Store metadata in MongoDB
+            # -----------------------------------
 
             image_data = ImageSchema(
 
@@ -137,8 +139,25 @@ async def upload_folder(
                 image_name=file.name
             )
 
-            insert_image_db(
+
+
+            image_id = insert_image_db(
                 image_data
+            )
+
+
+
+            # -----------------------------------
+            # Generate embedding using image_id
+            # -----------------------------------
+
+            generate_single_image_embedding(
+
+                image_path=file,
+
+                event_id=event_id,
+
+                image_id=image_id
             )
 
 
