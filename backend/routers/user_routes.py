@@ -13,7 +13,7 @@ from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from pathlib import Path
 from backend.config import DATA_DIR
-from backend.services.mongo_service import get_image_by_name_and_event
+from backend.services.mongo_service import get_image_by_id
 from backend.services.mongo_service import get_event_by_name
 
 router = APIRouter(prefix="/user")
@@ -156,14 +156,13 @@ async def get_photos(
 
         for item in results:
 
-            image_name = item["image_name"]
+            image_id = item["image_id"]
 
             score = item["score"]
 
             image_doc = (
-                get_image_by_name_and_event(
-                    image_name,
-                    event_id
+                get_image_by_id(
+                    image_id,
                 )
             )
 

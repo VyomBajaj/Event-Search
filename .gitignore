@@ -20,3 +20,6 @@ backend/uploads/
 
 # Temp files
 *.tmp
+
+#Embeddings File
+scripts/store.json
