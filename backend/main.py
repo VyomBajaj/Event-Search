@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.database import db
 
 
-
 app = FastAPI()
 
 app.add_middleware(
@@ -22,6 +21,8 @@ app.add_middleware(
 
 
 router = APIRouter()
+
+# test_pinecone()
 
 @app.get('/')
 def home_route():

@@ -147,7 +147,7 @@ async def get_photos(
         results = match_faces(
             event_id,
             query_embedding,
-            k=10
+            threshold=0.45
         )
 
         # 4. Fetch MongoDB metadata
