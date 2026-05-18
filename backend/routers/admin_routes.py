@@ -10,6 +10,7 @@ router = APIRouter(prefix='/admin')
 from backend.services.cloudinary_service import upload_dataset_image
 from backend.services.mongo_service import insert_image_db
 from backend.schemas.image_schema import ImageSchema
+from backend.services.pinecone_service import store_embedding
 
 
 @router.post('/create-event')
@@ -109,9 +110,7 @@ async def upload_folder(
 
         for file in processed_path.glob("*"):
 
-            # -----------------------------------
-            # Upload to Cloudinary
-            # -----------------------------------
+            
 
             uploaded = upload_dataset_image(
                 file,
@@ -119,10 +118,6 @@ async def upload_folder(
             )
 
 
-
-            # -----------------------------------
-            # Store metadata in MongoDB
-            # -----------------------------------
 
             image_data = ImageSchema(
 
@@ -147,20 +142,29 @@ async def upload_folder(
 
 
 
-            # -----------------------------------
-            # Generate embedding using image_id
-            # -----------------------------------
-
-            generate_single_image_embedding(
+            embedding_vectors = generate_single_image_embedding(
 
                 image_path=file,
-
-                event_id=event_id,
-
                 image_id=image_id
             )
 
+            if (
+                embedding_vectors
+                and len(embedding_vectors) > 0
+            ):
 
+                store_embedding(
+                    image_id,
+                    event_id,
+                    embedding_vectors[0]
+                )   
+
+            else:
+
+                print(
+                    f"No embeddings generated "
+                    f"for image: {image_id}"
+                )
 
         return {
             "message":
