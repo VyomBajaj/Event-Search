@@ -192,7 +192,7 @@ async def get_photos(
     finally:
 
         if os.path.exists(query_path):
-
+            
             os.remove(query_path)
 
 
