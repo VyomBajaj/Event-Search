@@ -34,7 +34,18 @@ def load_data():
 
     return {}
 
-EMBEDDINGS_CACHE = load_data()
+EMBEDDINGS_CACHE = {}
+
+
+def refresh_embeddings_cache():
+
+    global EMBEDDINGS_CACHE
+
+    EMBEDDINGS_CACHE = load_data()
+
+
+# Initial load at startup
+refresh_embeddings_cache()
 def match_faces(event_id, query_embedding,
                 k=10, threshold=0.45):
 
