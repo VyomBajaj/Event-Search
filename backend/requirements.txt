@@ -70,7 +70,6 @@ PyYAML==6.0.3
 requests==2.33.1
 retina-face==0.0.17
 rich==15.0.0
-setuptools==82.0.1
 six==1.17.0
 soupsieve==2.8.3
 starlette==1.0.0
@@ -87,5 +86,4 @@ uvloop==0.22.1
 watchfiles==1.1.1
 websockets==16.0
 Werkzeug==3.1.8
-wheel==0.47.0
 wrapt==2.1.2
