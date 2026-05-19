@@ -1,7 +1,7 @@
 import os
 import json
 import numpy as np
-from backend.services.pinecone_service import (
+from services.pinecone_service import (
     search_similar_faces
 )
 

@@ -1,6 +1,6 @@
 from fastapi import FastAPI,APIRouter
-from backend.routers import user_routes
-from backend.routers import admin_routes
+from routers import user_routes
+from routers import admin_routes
 from fastapi.middleware.cors import CORSMiddleware
 
 

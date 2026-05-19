@@ -1,12 +1,12 @@
 from bson import ObjectId
 
-from backend.database.db import (
+from database.db import (
     events_collection,
     images_collection
 )
 
-from backend.schemas.event_schema import EventSchema
-from backend.schemas.image_schema import ImageSchema
+from schemas.event_schema import EventSchema
+from schemas.image_schema import ImageSchema
 
 def create_event_db(event_name):
 

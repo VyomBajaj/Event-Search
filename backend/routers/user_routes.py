@@ -1,16 +1,15 @@
 from fastapi import APIRouter, UploadFile, File, Form , HTTPException
 from fastapi.responses import FileResponse
-from backend.config import UPLOAD_DIR, DATA_DIR , BASE_DIR
-from backend.utils.generate_query_embeddings import generate_query_embeddings
-from backend.utils.match_faces import match_faces
-from backend.services.cloudinary_service import upload_user_image
-from backend.utils.download_temp_image import download_temp_image
+from config import UPLOAD_DIR, DATA_DIR , BASE_DIR
+from utils.generate_query_embeddings import generate_query_embeddings
+from utils.match_faces import match_faces
+from services.cloudinary_service import upload_user_image
+from utils.download_temp_image import download_temp_image
 import os
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
-from backend.config import DATA_DIR
-from backend.services.mongo_service import get_image_by_id
-from backend.services.mongo_service import get_event_by_name
+from services.mongo_service import get_image_by_id
+from services.mongo_service import get_event_by_name
 
 router = APIRouter(prefix="/user")
 

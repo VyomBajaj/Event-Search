@@ -3,13 +3,13 @@ from pathlib import Path
 import tempfile
 import shutil
 import zipfile
-from backend.utils.generate_folder_embeddings import generate_single_image_embedding
-from backend.services.mongo_service import create_event_db
+from utils.generate_folder_embeddings import generate_single_image_embedding
+from services.mongo_service import create_event_db
 router = APIRouter(prefix='/admin')
-from backend.services.cloudinary_service import upload_dataset_image
-from backend.services.mongo_service import insert_image_db
-from backend.schemas.image_schema import ImageSchema
-from backend.services.pinecone_service import store_embedding
+from services.cloudinary_service import upload_dataset_image
+from services.mongo_service import insert_image_db
+from schemas.image_schema import ImageSchema
+from services.pinecone_service import store_embedding
 
 
 @router.post('/create-event')
