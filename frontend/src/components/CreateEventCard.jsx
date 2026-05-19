@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { StatusMessage } from "./StatusMessage";
-const CREATE_EVENT_URL = "http://127.0.0.1:8000/admin/create-event";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const CREATE_EVENT_URL = `${BASE_URL}/admin/create-event`;
 export function CreateEventCard({
   setSelectedEvent
 }) {

@@ -1,17 +1,13 @@
 from fastapi import APIRouter, UploadFile, File, Form , HTTPException
 from fastapi.responses import FileResponse
-from pathlib import Path
-from backend.config import UPLOAD_DIR
-import shutil
 from backend.config import UPLOAD_DIR, DATA_DIR , BASE_DIR
-from utils.generate_query_embeddings import generate_query_embeddings
-from utils.match_faces import match_faces
+from backend.utils.generate_query_embeddings import generate_query_embeddings
+from backend.utils.match_faces import match_faces
 from backend.services.cloudinary_service import upload_user_image
-from utils.download_temp_image import download_temp_image
+from backend.utils.download_temp_image import download_temp_image
 import os
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
-from pathlib import Path
 from backend.config import DATA_DIR
 from backend.services.mongo_service import get_image_by_id
 from backend.services.mongo_service import get_event_by_name
@@ -19,7 +15,7 @@ from backend.services.mongo_service import get_event_by_name
 router = APIRouter(prefix="/user")
 
 @router.post("/upload")
-async def upload_details(
+def upload_details(
     file: UploadFile = File(...),
     event: str = Form(...)
 ):
@@ -119,7 +115,7 @@ async def upload_details(
 
 
 @router.post("/getPhotos")
-async def get_photos(
+def get_photos(
     event_id: str = Form(...),
     image_url: str = Form(...)
 ):

@@ -1,7 +1,7 @@
 import { useState } from "react";
-
-const UPLOAD_URL = "http://127.0.0.1:8000/user/upload";
-const GET_PHOTOS_URL = "http://127.0.0.1:8000/user/getPhotos";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const UPLOAD_URL = `${BASE_URL}/user/upload`;
+const GET_PHOTOS_URL = `${BASE_URL}/user/getPhotos`;
 
 export default function FormCard({ setResults, setSubmitted }) {
   const [eventName, setEventName] = useState("");
@@ -36,6 +36,7 @@ export default function FormCard({ setResults, setSubmitted }) {
       if (!uploadRes.ok) throw new Error("Upload failed");
 
       const uploadData = await uploadRes.json();
+      console.log(uploadData);
       const eventId = uploadData.event_id;
       const imageUrl = uploadData.image_url;
 
@@ -45,6 +46,7 @@ export default function FormCard({ setResults, setSubmitted }) {
       matchForm.append("event_id", eventId);
 
       matchForm.append("image_url", imageUrl);
+      
 
       const matchRes = await fetch(GET_PHOTOS_URL, {
         method: "POST",

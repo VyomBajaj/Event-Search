@@ -1,10 +1,9 @@
 from fastapi import Form, APIRouter,UploadFile,File
-from backend.config import UPLOAD_DIR,DATA_DIR
 from pathlib import Path
 import tempfile
 import shutil
 import zipfile
-from utils.generate_folder_embeddings import generate_single_image_embedding
+from backend.utils.generate_folder_embeddings import generate_single_image_embedding
 from backend.services.mongo_service import create_event_db
 router = APIRouter(prefix='/admin')
 from backend.services.cloudinary_service import upload_dataset_image
@@ -29,7 +28,7 @@ async def create_event(event: str = Form(...)):
     }
 
 @router.post('/upload-folder')
-async def upload_folder(
+def upload_folder(
     event_id: str = Form(...),
     zip_file: UploadFile = File(...)
 ):

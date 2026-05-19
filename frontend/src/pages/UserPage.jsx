@@ -3,6 +3,7 @@ import "../App.css";
 import Hero from "../components/Hero";
 import FormCard from "../components/FormCard";
 import Navbar from "../components/Navbar";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function UserPage() {
 
@@ -70,7 +71,7 @@ export default function UserPage() {
                           </a>
 
                           <a
-                            href={`http://127.0.0.1:8000/user/download?path=${encodeURIComponent(getRelativePath(r.image))}`}
+                            href={`${BASE_URL}/user/download?path=${encodeURIComponent(getRelativePath(r.image))}`}
                             className="download-link"
                             target="_blank"
                             rel="noreferrer"
